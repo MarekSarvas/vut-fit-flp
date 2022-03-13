@@ -1,6 +1,6 @@
 
 all:
-	ghc -o ./flp21-fun src/Main 
+	ghc -Wall -o ./flp21-fun src/Main 
 
 test1:
 	./flp21-fun -2 test/test01.in
