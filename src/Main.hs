@@ -2,9 +2,9 @@ import System.Environment
 
 main :: IO ()
 main = do 
-    getArgs >>= parseArgs
+    s <- parseArgs <$> getArgs
+    putStrLn s
     return ()
 
-
-parseArgs ("-i":xs) = fmap putStrLn xs 
-parseArgs a = sequence (map putStrLn a)
+parseArgs :: [String] -> String
+parseArgs _ = "hello"
