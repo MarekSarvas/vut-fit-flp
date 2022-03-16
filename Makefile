@@ -2,7 +2,7 @@
 all:
 	ghc -Wall -o ./flp21-fun src/Main 
 
-flp21-fun:
+flp21-fun: src/Main.hs
 	ghc -Wall -o ./flp21-fun src/Main 
 
 test1: flp21-fun 
