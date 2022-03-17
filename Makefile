@@ -8,6 +8,9 @@ flp21-fun: src/Main.hs
 test1: flp21-fun 
 	./flp21-fun -i test/test01.in
 
+stdin: flp21-fun
+	./flp21-fun -i 
+
 zip:
 	zip -r flp-fun-xsarva00.zip ./doc ./src ./test Makefile
 
