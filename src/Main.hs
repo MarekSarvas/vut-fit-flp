@@ -11,7 +11,8 @@ type Nonterminals = [Nonterminal]
 type Terminal = String
 type Terminals = [Terminal]
 
-type Rule = (Nonterminal, Terminals)
+-- Nonterminals because of e.g. <Aa>
+type Rule = (Nonterminals, [String])
 type Rules = [Rule] 
 
 data Grammar = Grammar
@@ -21,8 +22,6 @@ data Grammar = Grammar
       rules :: [Rule]
     } deriving (Show)
 
-parseStartSymbol :: Parser String 
-parseStartSymbol =  fmap (\x -> [x]) (oneOf ['A'..'Z']) <* newline
 
 parseRules :: Parser String
 parseRules = sepBy1 (oneOf ['A'..'Z']) (string "->") <* eof
@@ -42,11 +41,8 @@ parseOneTerminal :: Parser Terminal
 parseOneTerminal = fmap (\x -> [x]) (oneOf ['a'..'z']) 
 
 
-
-
-
-
-
+parseStartSymbol :: Parser String 
+parseStartSymbol =  fmap (\x -> [x]) (oneOf ['A'..'Z']) <* newline
 
 
 parseGrammar :: String -> Either ParseError Grammar
