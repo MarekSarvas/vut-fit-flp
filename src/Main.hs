@@ -55,16 +55,19 @@ parseGrammar'  = do
     start <- parseStartSymbol
     return Grammar {nonterminals=nonterms, terminals=terms, startNonterm=start, rules=[]}
 
+-- foldl pre rules a vo funkcii && ci je elementom nonterms ++ terms 
+checkSemantics :: Grammar -> Grammar
+checkSemantics g = 
+    if startNonterm g `elem` nonterminals g then g 
+    else error "Invalid starting symbol"
 
 
 main :: IO ()
 main = do 
     (action, content) <- parseArgs <$> getArgs
-    file_path <- content  
-    a <-  performAction action file_path
-    putStrLn a
-
-    --putStrLn $ head $ lines file_path
+    string_g <- content  
+    g <-  performAction action string_g 
+    putStrLn g
     return ()
 
 
@@ -85,7 +88,7 @@ parseArgs (x:y:_)
 
 performAction :: String -> String -> IO String 
 performAction action content
-    | action == "-i" = return $ show $ parseGrammar content 
-    | action == "1" = return $ show $ Grammar {nonterminals=[], terminals=[content], startNonterm="S1", rules=[]}  
+    | action == "-i" = return $ show $ fmap checkSemantics ( parseGrammar content )
+    | action == "1" = return $ show $ checkSemantics $ Grammar {nonterminals=[], terminals=[content], startNonterm="S1", rules=[]}  
     | action == "2" = return $ show $ Grammar {nonterminals=[], terminals=[content], startNonterm="S2", rules=[]}  
     | otherwise = error "Wrong argument" 
