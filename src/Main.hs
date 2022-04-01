@@ -82,7 +82,7 @@ checkRules (x:xs) = checkRules [x]
 -- ======================= Algorithm 1 =======================
 removeSimple :: Grammar -> Grammar
 removeSimple g = Grammar {nonterminals=nonterminals g, terminals=terminals g, startNonterm=startNonterm g, rules=newRules}
-    where newRules = createRules (createNa (nonterminals g) (rules g)) (rules g)
+    where newRules = createRules (createNa (nonterminals g) (getSimpleRules (rules g) (nonterminals g))) (removeSimpleRules (rules g) ( terminals g))
  
 
 -- TODO GET SIMPLE RULES BEFORE AND REMOVE SIMPLE RULES BEFORE createRules FUNCTION
@@ -98,9 +98,6 @@ createNa' rs nA0 =
     else createNa' rs nA1
         where nA1 = nub (nA0 ++ concatMap snd (filter (\r -> fst r `elem` nA0) rs )) -- TODO change for union ? 
 
--- get list of simple rules A->B
-getSimpleRules :: Rules -> Nonterminals -> Rules
-getSimpleRules rs nonts = filter ( \r -> any (`elem` nonts) (snd r) && length (snd r) == 1) rs
 
 createRules :: NaSets -> Rules -> Rules
 createRules [] _ = []
@@ -108,6 +105,13 @@ createRules (x:xs) rs = createRules' x rs : createRules xs rs
 
 createRules' :: NaSet -> Rules -> Rules
 createRules' nas rs = filter (\r -> fst r /= "") (map (\r -> if fst r `elem` snd nas then (fst nas, snd r) else ("",[])) rs)
+
+-- get list of simple rules A->B
+getSimpleRules :: Rules -> Nonterminals -> Rules
+getSimpleRules rs nonts = filter ( \r -> any (`elem` nonts) (snd r) && length (snd r) == 1) rs
+
+removeSimpleRules :: Rules -> Terminals -> Rules
+removeSimpleRules rs ts = filter ( \r -> any (`elem` ts) (snd r) || length (snd r) /= 1) rs
 
 -- ===================== Load Grammar =======================
 main :: IO ()
