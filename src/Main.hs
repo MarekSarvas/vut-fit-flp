@@ -1,7 +1,5 @@
 import System.Environment   
-import System.IO
-import Text.Parsec (char, count, endBy, eof, many1, newline, oneOf, parse, ParseError,
-  sepBy, sepBy1, string)
+import Text.Parsec (char, endBy, eof, many1, newline, oneOf, parse, ParseError, sepBy1, string)
 import Text.Parsec.String (Parser)
 
 -- Data types for Grammar representation
@@ -11,8 +9,8 @@ type Nonterminals = [Nonterminal]
 type Terminal = String
 type Terminals = [Terminal]
 
--- Nonterminals because of e.g. <Aa>
-type Rule = (Nonterminals, [String])
+-- Nonterminal is string because of e.g. <Aa>
+type Rule = (Nonterminal, [String])
 type Rules = [Rule] 
 
 data Grammar = Grammar
@@ -22,9 +20,6 @@ data Grammar = Grammar
       rules :: [Rule]
     } deriving (Show)
 
-
-parseRules :: Parser String
-parseRules = sepBy1 (oneOf ['A'..'Z']) (string "->") <* eof
 
 -- Parse correct Nonterminal input 
 parseNonTerminals :: Parser Nonterminals 
@@ -40,20 +35,32 @@ parseTerminals = sepBy1 parseOneTerminal (char ',') <* newline --read until \n
 parseOneTerminal :: Parser Terminal 
 parseOneTerminal = fmap (\x -> [x]) (oneOf ['a'..'z']) 
 
-
 parseStartSymbol :: Parser String 
 parseStartSymbol =  fmap (\x -> [x]) (oneOf ['A'..'Z']) <* newline
 
+parseRules :: Parser Rules
+parseRules =  endBy parseRule newline 
+
+parseRule :: Parser Rule 
+parseRule = toRule <$> parseLeft <*> parseRight
+    where toRule l r = (l, map (\x -> [x]) r)
+
+parseLeft :: Parser String 
+parseLeft = fmap (: []) (oneOf ['A'..'Z']) <* string "->" 
+
+parseRight :: Parser String 
+parseRight = many1 (oneOf (['A'..'Z']++['a'..'z']))
 
 parseGrammar :: String -> Either ParseError Grammar
-parseGrammar stringGrammar = parse parseGrammar' "Wrong Grammar Format" stringGrammar
+parseGrammar = parse parseGrammar' "Wrong Grammar Format"
 
 parseGrammar' :: Parser Grammar 
 parseGrammar'  = do
     nonterms <- parseNonTerminals 
     terms <- parseTerminals  
     start <- parseStartSymbol
-    return Grammar {nonterminals=nonterms, terminals=terms, startNonterm=start, rules=[]}
+    rule <- parseRules <* eof
+    return Grammar {nonterminals=nonterms, terminals=terms, startNonterm=start, rules=rule}
 
 -- foldl pre rules a vo funkcii && ci je elementom nonterms ++ terms 
 checkSemantics :: Grammar -> Grammar
@@ -70,11 +77,6 @@ main = do
     putStrLn g
     return ()
 
-
-tmp :: [String] -> String
-tmp [] = "Empty"
-tmp (x:y:z:q) = z
-tmp _ = "IDK"
 
 parseArgs :: [String] -> (String, IO String) 
 parseArgs [] = error "No arguments" 
