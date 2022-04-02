@@ -85,7 +85,6 @@ removeSimple g = Grammar {nonterminals=nonterminals g, terminals=terminals g, st
     where newRules = createRules (createNa (nonterminals g) (getSimpleRules (rules g) (nonterminals g))) (removeSimpleRules (rules g) ( terminals g))
  
 
--- TODO GET SIMPLE RULES BEFORE AND REMOVE SIMPLE RULES BEFORE createRules FUNCTION
 -- creates list of N_A sets for each nonterminal A
 createNa :: Nonterminals -> Rules -> NaSets
 createNa [] _ = []
@@ -101,7 +100,7 @@ createNa' rs nA0 =
 
 createRules :: NaSets -> Rules -> Rules
 createRules [] _ = []
-createRules (x:xs) rs = createRules' x rs : createRules xs rs 
+createRules (x:xs) rs = createRules' x rs ++ createRules xs rs 
 
 createRules' :: NaSet -> Rules -> Rules
 createRules' nas rs = filter (\r -> fst r /= "") (map (\r -> if fst r `elem` snd nas then (fst nas, snd r) else ("",[])) rs)
@@ -136,6 +135,6 @@ parseArgs (x:y:_)
 performAction :: String -> String -> IO String 
 performAction action content
     | action == "-i" = return $ show $ fmap checkSemantics ( parseGrammar content )
-    | action == "1" = return $ show $ fmap checkSemantics ( parseGrammar content )  
+    | action == "1" = return $ show (removeSimple <$> fmap checkSemantics (parseGrammar content))
     | action == "2" = return $ show $ fmap checkSemantics ( parseGrammar content )   
     | otherwise = error "Wrong argument" 
