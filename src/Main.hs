@@ -82,7 +82,9 @@ checkSemantics :: Grammar -> Grammar
 checkSemantics g = 
     if startNonterm g `notElem` nonterminals g then error "Invalid starting symbol"
     else if not $ checkRules (rules g) (terminals g) (nonterminals g) then error "Invalid symbol in rules"
+    else if hasDuplicates (nonterminals g) || hasDuplicates (terminals g) || hasDuplicates (rules g) then error "Duplicate symbols or rules in grammar"  -- check for duplicate symbols
     else g 
+        where hasDuplicates x = length x /= length (nub x)
 
 checkRules :: Rules -> Terminals -> Nonterminals -> Bool
 checkRules [] _ _ = True
