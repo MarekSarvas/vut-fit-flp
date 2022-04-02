@@ -147,6 +147,9 @@ transformRule' :: Nonterminal -> Nonterminals -> Terminals -> Rules
 transformRule' l r terms -- l is left side of rule, r right side of the rule 
     | l `notElem` terms && length r > 2 && startWithTerm r =  (l, (head r++"'") : [createNewNont $ tail r])  : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->aBC create A->a'<BC>, a'->a and recursively call itself
     | l `notElem` terms && length r > 2 && not (startWithTerm r) =  (l, head r : [createNewNont $ tail r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->DaBC create A->D<aBC> and recursively call itself
+    -- | l `elem` terms && length r > 2 && not (startWithTerm r) =  (l++"'", head r : [createNewNont $ tail r]) : (l++"'", [l]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->DaBC create A->D<aBC> and recursively call itself
+    -- | l `elem` terms && length r > 2 && startWithTerm r =  (l++"'", (head r++"'") : [createNewNont $ tail r]): (l++"'", [l]) : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->aBC create A->a'<BC>, a'->a and recursively call itself
+    | l `elem` terms && length r == 2 = (l++"'", transformTerms r) : (l++"'", [l]) : concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
     | length r == 2 = [(l, transformTerms r)] ++ concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
     | otherwise = []
         where 
