@@ -2,7 +2,6 @@ import System.Environment
 import Text.Parsec (char, endBy, eof, many1, newline, oneOf, parse, ParseError, sepBy1, string)
 import Text.Parsec.String (Parser)
 import Data.List (nub, intercalate, union, sort)
-import Data.Either (fromRight)
 
 -- Data types for Grammar representation
 type Nonterminal = String
@@ -69,9 +68,6 @@ parseRight = many1 (oneOf (['A'..'Z']++['a'..'z']))
 -- parse whole content to Grammar inner representation
 parseGrammar :: String -> Either ParseError Grammar
 parseGrammar = parse parseGrammar' "Wrong input grammar"
-
---parseGrammar'' :: String -> Either String Grammar
---parseGrammar'' = parse parseGrammar' "Wrong input grammar"
 
 parseGrammar' :: Parser Grammar 
 parseGrammar'  = do
@@ -177,10 +173,16 @@ parseArgs (x:y:_)
     | x `elem` ["-i", "1", "2"] = (x, readFile y)
     | otherwise = error "Wrong first argument"
 
+-- checks for parse error, remove Either
+checkError :: Either ParseError Grammar -> Grammar
+checkError x = case x of
+    (Right g) -> g
+    (Left _) -> error "Invalid grammar"
+
 -- preform desired action based on program arguments
 performAction :: String -> String -> IO String 
 performAction action content
-    | action == "-i" = return $ show $ fromRight Grammar {nonterminals=[], terminals=[], startNonterm=[], rules=[]} $ fmap checkSemantics ( parseGrammar content )
-    | action == "1" = return $ show $ fromRight Grammar {nonterminals=[], terminals=[], startNonterm=[], rules=[]} (removeSimple <$> fmap checkSemantics (parseGrammar content))
-    | action == "2" = return $ show $ fromRight Grammar {nonterminals=[], terminals=[], startNonterm=[], rules=[]} (toCNF . removeSimple <$> fmap checkSemantics (parseGrammar content))   
+    | action == "-i" = return $ show $ checkError $ fmap checkSemantics ( parseGrammar content )
+    | action == "1" = return $ show $ checkError (removeSimple <$> fmap checkSemantics (parseGrammar content))
+    | action == "2" = return $ show $ checkError (toCNF . removeSimple <$> fmap checkSemantics (parseGrammar content))   
     | otherwise = error "Wrong argument" 
