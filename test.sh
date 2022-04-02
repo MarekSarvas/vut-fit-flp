@@ -1,5 +1,6 @@
+#!/bin/bash
 # Project: FLP project 1 - BKG-2-CNF test script
-# Author: Marek Sarvas, xsarva00
+# Author: Marek Sarvas
 # Login: xsarva00
 # Date: 2021/2022
 
@@ -12,12 +13,11 @@ proj=flp21-fun
 TEST_PATH=./test
 
 prefix=""
-if [ $option == "i" ]; then
+if [ $option = "i" ]; then
     prefix="-"
 fi
-
 # compile project
-make
+#make
 correct=0
 all=0
 if [ $option != "e" ];then
@@ -73,6 +73,3 @@ if [ $option == "e" ];then
     done
     echo "Correct ${correct}/${all}"
 fi
-
-
-

@@ -14,6 +14,11 @@ test2: flp21-fun
 teste: flp21-fun 
 	./test.sh e	
 
+tests: flp21-fun 
+	./test.sh i	
+	./test.sh 1	
+	./test.sh 2	
+	./test.sh e	
 stdin: flp21-fun
 	./flp21-fun -i 
 

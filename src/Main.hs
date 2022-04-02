@@ -1,3 +1,8 @@
+-- Project: FLP project 1 - BKG-2-CNF
+-- Author: Marek Sarvas
+-- Login: xsarva00
+-- Date: 2021/2022
+
 import System.Environment   
 import Text.Parsec (char, endBy, eof, many1, newline, oneOf, parse, ParseError, sepBy1, string)
 import Text.Parsec.String (Parser)
