@@ -1,7 +1,8 @@
 import System.Environment   
 import Text.Parsec (char, endBy, eof, many1, newline, oneOf, parse, ParseError, sepBy1, string)
 import Text.Parsec.String (Parser)
-import Data.List (nub)
+import Data.List (nub, intercalate, union, sort)
+import Data.Either (fromRight)
 
 -- Data types for Grammar representation
 type Nonterminal = String
@@ -14,8 +15,6 @@ type Terminals = [Terminal]
 type Rule = (Nonterminal, [String])
 type Rules = [Rule] 
 
-type RuleString = [String]
-
 type NaSet = (Nonterminal, Nonterminals)
 type NaSets = [NaSet]
 
@@ -25,8 +24,12 @@ data Grammar = Grammar
       terminals :: Terminals,
       startNonterm :: Nonterminal,
       rules :: [Rule]
-    } deriving (Show)
-
+    } 
+instance Show Grammar where
+    show (Grammar n t s rs) = remnewline $ unlines $ [intercalate "," n] ++ [intercalate "," t] ++ [s] ++
+        sort (map (\r -> fst r ++ "->" ++ intercalate "" (snd r)) rs)
+            where remnewline = reverse . dropWhile (=='\n') . reverse
+    --
 -- ============= PARSER ====================
 -- Parse correct Nonterminal input 
 parseNonTerminals :: Parser Nonterminals 
@@ -111,6 +114,36 @@ getSimpleRules rs nonts = filter ( \r -> any (`elem` nonts) (snd r) && length (s
 
 removeSimpleRules :: Rules -> Terminals -> Rules
 removeSimpleRules rs ts = filter ( \r -> any (`elem` ts) (snd r) || length (snd r) /= 1) rs
+-- ===================== Algorithm 2 =======================
+
+toCNF :: Grammar -> Grammar 
+toCNF g = Grammar {nonterminals=newNonterms, terminals=terminals g, startNonterm=startNonterm g, rules=newRules}
+    where
+        newRules = createCNFRules (rules g)  (terminals g)
+        newNonterms = nonterminals g `union` map fst newRules 
+
+createCNFRules :: Rules -> Terminals -> Rules
+createCNFRules rs terms  =
+    if all (`isNormRule` terms) rs then nub rs 
+    else createCNFRules (nub $ concatMap (\r -> if not (isNormRule r terms) then transformRule' (fst r) (snd r) terms else [r]) rs) terms 
+
+-- Checks if current rule is in CNF A->BC or  A->a
+isNormRule :: Rule -> Terminals -> Bool
+isNormRule (_, r) terms = length r == 2 && all (`notElem` terms ) r || length r == 1 && all (`elem` terms) r 
+
+-- transformRule :: Rule -> Rules
+-- transformRule (l, r) = [ (l, [intercalate "" (["<"] ++ r ++ [">"])]) ] ++ []
+
+transformRule' :: Nonterminal -> Nonterminals -> Terminals -> Rules
+transformRule' l r terms 
+    | l `notElem` terms && length r > 2 && startWithTerm r =  (l, (head r++"'") : [createNewNont $ tail r])  : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->aBC create A->a'<BC>, a'->a and recursively call itself
+    | l `notElem` terms && length r > 2 && not (startWithTerm r) =  (l, head r : [createNewNont $ tail r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->DaBC create A->D<aBC> and recursively call itself
+    | length r == 2 = [(l, transformTerms r)] ++ concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
+    | otherwise = []
+        where 
+            startWithTerm x = head x `elem` terms
+            createNewNont x = intercalate "" (["<"] ++ x ++ [">"]) 
+            transformTerms x = map (\y -> if y `elem` terms then y++"'" else y) x
 
 -- ===================== Load Grammar =======================
 main :: IO ()
@@ -131,10 +164,9 @@ parseArgs (x:y:_)
     | x `elem` ["-i", "1", "2"] = (x, readFile y)
     | otherwise = error "Wrong first argument"
 
-
 performAction :: String -> String -> IO String 
 performAction action content
-    | action == "-i" = return $ show $ fmap checkSemantics ( parseGrammar content )
-    | action == "1" = return $ show (removeSimple <$> fmap checkSemantics (parseGrammar content))
-    | action == "2" = return $ show $ fmap checkSemantics ( parseGrammar content )   
+    | action == "-i" = return $ show $ fromRight Grammar {nonterminals=[], terminals=[], startNonterm=[], rules=[]} $ fmap checkSemantics ( parseGrammar content )
+    | action == "1" = return $ show $ fromRight Grammar {nonterminals=[], terminals=[], startNonterm=[], rules=[]} (removeSimple <$> fmap checkSemantics (parseGrammar content))
+    | action == "2" = return $ show $ fromRight Grammar {nonterminals=[], terminals=[], startNonterm=[], rules=[]} (toCNF . removeSimple <$> fmap checkSemantics (parseGrammar content))   
     | otherwise = error "Wrong argument" 
