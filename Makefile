@@ -1,8 +1,8 @@
 all:flp21-fun
 	./flp21-fun 2 ./test/test01.in
 
-flp21-fun: src/Main.hs
-	ghc -Wall -o ./flp21-fun src/Main 
+flp21-fun: src/*.hs
+	ghc -Wall -o ./flp21-fun $^ 
 
 testi: flp21-fun 
 	./test.sh i	
@@ -25,4 +25,4 @@ zip:
 	zip -r flp-fun-xsarva00.zip ./doc ./src ./test Makefile test.sh
 
 clean:
-	rm ./flp21-fun src/Main.hi src/Main.o
+	rm ./flp21-fun src/*.hi src/*.o
