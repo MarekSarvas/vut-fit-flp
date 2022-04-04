@@ -25,4 +25,4 @@ zip:
 	zip -r flp-fun-xsarva00.zip ./doc ./src ./test Makefile test.sh
 
 clean:
-	rm ./flp21-fun src/*.hi src/*.o
+	rm ./flp21-fun src/*.hi src/*.o test/tmp

@@ -5,7 +5,7 @@
 -- Module: Custom data types
 
 module Types (Grammar(..), Nonterminals, Nonterminal, Terminal, Terminals, Rule, Rules, NaSet, NaSets) where
-import System.Environment   
+
 import Data.List (intercalate, sort)
 
 -- Data types for Grammar representation

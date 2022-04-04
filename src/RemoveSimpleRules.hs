@@ -6,10 +6,9 @@
 
 module RemoveSimpleRules (removeSimple) where
 
-import System.Environment   
 import Data.List (nub)
 
-import Types (Nonterminals, Nonterminal, Terminal, Terminals, Rule, Rules, Grammar(..), NaSet, NaSets)  
+import Types (Nonterminals, Terminals, Rules, Grammar(..), NaSet, NaSets)  
 
 -- ======================= Algorithm 1 =======================
 removeSimple :: Grammar -> Grammar

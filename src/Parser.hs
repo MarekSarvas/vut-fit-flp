@@ -6,10 +6,8 @@
 
 module Parser (parseGrammar) where 
 
-import System.Environment   
 import Text.Parsec (char, endBy, eof, many1, newline, oneOf, parse, ParseError, sepBy1, string)
 import Text.Parsec.String (Parser)
-import Data.List (nub, intercalate, union, sort)
 
 import Types (Nonterminals, Nonterminal, Terminal, Terminals, Rule, Rules, Grammar(..))
 

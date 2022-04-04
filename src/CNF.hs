@@ -5,10 +5,9 @@
 
 module CNF (toCNF) where
 
-import System.Environment   
 import Data.List (nub, intercalate, union)
 
-import Types (Nonterminals, Nonterminal, Terminal, Terminals, Rule, Rules, Grammar(..))  
+import Types (Nonterminals, Nonterminal, Terminals, Rule, Rules, Grammar(..))  
 
 -- ===================== Algorithm 2 =======================
 -- transform Grammar to CNF
