@@ -33,25 +33,25 @@ if [ $option != "e" ]; then
             # run programme
             ./$proj ${prefix}${option} ${TEST_PATH}/${test_in} > ${TEST_PATH}/tmp
             # check nonterminals
-            diff <(head -n 1 ${TEST_PATH}/tmp | sed -e $'s/,/\\\n/g' | sort) <(head -n 1 ${TEST_PATH}/${test_out} | sed -e $'s/,/\\\n/g' | sort) 
+            diff <(head -n 1 ${TEST_PATH}/tmp | sed -e $'s/,/\\\n/g' | sort) <(head -n 1 ${TEST_PATH}/${test_out} | sed -e $'s/,/\\\n/g' | sort) > /dev/null
             if [ $(echo $?) -ne 0 ]; then
                 echo "Wrong nonterminals"
                 continue
             fi
             # check terminals
-            diff <(head -n 2 ${TEST_PATH}/tmp | tail -n +2 | sort) <(head -n 2 ${TEST_PATH}/${test_out} | tail -n +2 | sort) > /dev/null
+            diff <(head -n 2 ${TEST_PATH}/tmp | tail -n +2 | sed -e $'s/,/\\\n/g' | sort) <(head -n 2 ${TEST_PATH}/${test_out} | tail -n +2  | sed -e $'s/,/\\\n/g' | sort) > /dev/null
             if [ $(echo $?) -ne 0 ]; then
                 echo "Wrong terminals"
                 continue
             fi
             #check starting symbol
-            diff <(head -n 3 ${TEST_PATH}/tmp | tail -n +3 | sort) <(head -n 3 ${TEST_PATH}/${test_out} | tail -n +3 | sort) > /dev/null
+            diff <(head -n 3 ${TEST_PATH}/tmp | tail -n +3 ) <(head -n 3 ${TEST_PATH}/${test_out} | tail -n +3 ) > /dev/null
             if [ $(echo $?) -ne 0 ]; then
                 echo "Incorrect starting symbol"
                 continue
             fi
             # check rules
-            diff <(tail -n +4 ${TEST_PATH}/tmp | sort) <(tail -n +4 ${TEST_PATH}/${test_out} | sort)
+            diff <(tail -n +4 ${TEST_PATH}/tmp | sort) <(tail -n +4 ${TEST_PATH}/${test_out} | sort) > /dev/null
             if [ $(echo $?) -ne 0 ]; then
                 echo "Incorrect rules"
                 continue

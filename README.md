@@ -15,7 +15,7 @@ Includes implementation of custom data type representing Grammar and its termina
 Implementation of functions for parsing Nonterminals, Terminals, Starting symbol and rules. Checks correct format of input and creates inner representation of BKG. Uses *Parser* functions from **Parsec** library. 
 ### RemoveSimpleRules.hs
 Implementation of algorithm for removing simple rules from BKG (TIN - algorithm 4.5). Creates **N_A** sets for each nonterminal **A**, then creates new rules so that simple rules can be removed.
-### CNF.hs
+### CNF.hsn
 Implementation of algorithm for transforming BKG to CNF (TIN - algorithm 4.7). While all rules are not in CNF, takes a rule that is not in CNF and create recursively all rules that are in CNF from it. Then performs union on grammar nonterminals and all nonterminals on the left side of rules to create new nonterminal set.
 ### Main.hs
 Implements IO operations in *do* block, parses programme arguments and performs correct action. Also includes implementation of functions for checking semantic correctness of input grammar such as valid starting symbol or valid symbols in rules according to given nonterminals and terminals. \
@@ -28,4 +28,5 @@ Testing script is implemented in **test.sh** and can be run as follows:
 ```
 bash test.sh [i|1|2|e]
 ```
-Input test files that don't have corresponding output files are ignored.
+Input test files that don't have corresponding output files are ignored.\
+**!** Grammar in test02.in is taken from discord.
