@@ -11,12 +11,13 @@ import Data.List (nub)
 import Types (Nonterminals, Terminals, Rules, Grammar(..), NaSet, NaSets)  
 
 -- ======================= Algorithm 1 =======================
+-- remove simple rules and create updated Grammar
 removeSimple :: Grammar -> Grammar
 removeSimple g = Grammar {nonterminals=nonterminals g, terminals=terminals g, startNonterm=startNonterm g, rules=newRules}
     where newRules = createRules (createNa (nonterminals g) (getSimpleRules (rules g) (nonterminals g))) (removeSimpleRules (rules g) ( terminals g))
  
 
--- creates list of N_A sets for each nonterminal A and concat them together
+-- creates list of N_A sets for each nonterminal A and concat them together e.g.: [(A, N_A), (B, N_B)]
 createNa :: Nonterminals -> Rules -> NaSets
 createNa [] _ = []
 createNa (x:xs) rs =  (x, createNa' rs [x]) : createNa xs rs

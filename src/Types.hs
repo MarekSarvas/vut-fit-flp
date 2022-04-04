@@ -9,13 +9,14 @@ module Types (Grammar(..), Nonterminals, Nonterminal, Terminal, Terminals, Rule,
 import Data.List (intercalate, sort)
 
 -- Data types for Grammar representation
+-- Nonterminal is string because of e.g. <Aa>
 type Nonterminal = String
 type Nonterminals = [Nonterminal]
 
 type Terminal = String
 type Terminals = [Terminal]
 
--- Nonterminal is string because of e.g. <Aa>
+-- rules stored as (A, ["A", "b", "C"]) for A->AbC
 type Rule = (Nonterminal, [String])
 type Rules = [Rule] 
 
@@ -28,7 +29,7 @@ data Grammar = Grammar
     { nonterminals :: Nonterminals,
       terminals :: Terminals,
       startNonterm :: Nonterminal,
-      rules :: [Rule]
+      rules :: Rules 
     } 
 instance Show Grammar where
     show (Grammar n t s rs) = remnewline $ unlines $ [intercalate "," n] ++ [intercalate "," t] ++ [s] ++

@@ -20,40 +20,44 @@ fi
 #make
 correct=0
 all=0
-if [ $option != "e" ];then
+if [ $option != "e" ]; then
     echo "Testing ${prefix}${option} option."
     tests=$(ls test | grep -E '[0-9]+.in')
     for test_in in $tests; do
-        ((all=all+1))
+        # create name of output file according to input file
         test_out=$(echo "${test_in/.in/_${option}.out}" )
 
-        # run programme
-        ./$proj ${prefix}${option} ${TEST_PATH}/${test_in} > ${TEST_PATH}/tmp
-        # check nonterminals
-        diff <(head -n 1 ${TEST_PATH}/tmp | sort) <(head -n 1 ${TEST_PATH}/${test_out} | sort) > /dev/null
-        if [ $(echo $?) -ne 0 ]; then
-            echo "Wrong nonterminals"
-            continue
+        # if output file for given input file does not exists the test is skipped
+        if [ -f ${TEST_PATH}/${test_out} ]; then
+            ((all=all+1))
+            # run programme
+            ./$proj ${prefix}${option} ${TEST_PATH}/${test_in} > ${TEST_PATH}/tmp
+            # check nonterminals
+            diff <(head -n 1 ${TEST_PATH}/tmp | sort) <(head -n 1 ${TEST_PATH}/${test_out} | sort) > /dev/null
+            if [ $(echo $?) -ne 0 ]; then
+                echo "Wrong nonterminals"
+                continue
+            fi
+            # check terminals
+            diff <(head -n 2 ${TEST_PATH}/tmp | tail -n +2 | sort) <(head -n 2 ${TEST_PATH}/${test_out} | tail -n +2 | sort) > /dev/null
+            if [ $(echo $?) -ne 0 ]; then
+                echo "Wrong terminals"
+                continue
+            fi
+            #check starting symbol
+            diff <(head -n 3 ${TEST_PATH}/tmp | tail -n +3 | sort) <(head -n 3 ${TEST_PATH}/${test_out} | tail -n +3 | sort) > /dev/null
+            if [ $(echo $?) -ne 0 ]; then
+                echo "Incorrect starting symbol"
+                continue
+            fi
+            # check rules
+            diff <(tail -n +4 ${TEST_PATH}/tmp | sort) <(tail -n +4 ${TEST_PATH}/${test_out} | sort)
+            if [ $(echo $?) -ne 0 ]; then
+                echo "Incorrect rules"
+                continue
+            fi
+            ((correct=correct+1))
         fi
-        # check terminals
-        diff <(head -n 2 ${TEST_PATH}/tmp | tail -n +2 | sort) <(head -n 2 ${TEST_PATH}/${test_out} | tail -n +2 | sort) > /dev/null
-        if [ $(echo $?) -ne 0 ]; then
-            echo "Wrong terminals"
-            continue
-        fi
-        #check starting symbol
-        diff <(head -n 3 ${TEST_PATH}/tmp | tail -n +3 | sort) <(head -n 3 ${TEST_PATH}/${test_out} | tail -n +3 | sort) > /dev/null
-        if [ $(echo $?) -ne 0 ]; then
-            echo "Incorrect starting symbol"
-            continue
-        fi
-        # check rules
-        diff <(tail -n +4 ${TEST_PATH}/tmp | sort) <(tail -n +4 ${TEST_PATH}/${test_out} | sort)
-        if [ $(echo $?) -ne 0 ]; then
-            echo "Incorrect rules"
-            continue
-        fi
-        ((correct=correct+1))
     done
     echo "Correct ${correct}/${all}"
 fi
@@ -62,13 +66,16 @@ if [ $option == "e" ];then
     echo "Testing for wrong inputs"
     tests=$(ls test | grep err.in)
     for test_in in $tests; do
-        ((all=all+1))
         test_out=$(echo "${test_in/.in/_${option}.out}" )
-        # run programme
-        ./$proj -i ${TEST_PATH}/${test_in} > ${TEST_PATH}/tmp > /dev/null 2>&1
-        # if caught error add as correct test
-        if [ $(echo $?) -ne 0 ]; then
-            ((correct=correct+1))
+
+        if [ ! -f ${TEST_PATH}/${test_out} ]; then
+            ((all=all+1))
+            # run programme
+            ./$proj -i ${TEST_PATH}/${test_in} > ${TEST_PATH}/tmp > /dev/null 2>&1
+            # if caught error add as correct test
+            if [ $(echo $?) -ne 0 ]; then
+                ((correct=correct+1))
+            fi
         fi
     done
     echo "Correct ${correct}/${all}"

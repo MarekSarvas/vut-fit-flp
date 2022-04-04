@@ -27,14 +27,16 @@ createCNFRules rs terms  =
 isNormRule :: Rule -> Terminals -> Bool
 isNormRule (_, r) terms = length r == 2 && all (`notElem` terms ) r || length r == 1 && all (`elem` terms) r 
 
--- create rules that in CNF from rule that is not in CNF
+-- create all rules in CNF from one rule that is not in CNF
 transformRule' :: Nonterminal -> Nonterminals -> Terminals -> Rules
 transformRule' l r terms -- l is left side of rule, r right side of the rule 
-    |  length r > 2 && startWithTerm r =  (l, (head r++"'") : [createNewNont $ tail r])  : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->aBC create A->a'<BC>, a'->a and recursively call itself
-    |  length r > 2 && not (startWithTerm r) =  (l, head r : [createNewNont $ tail r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->DaBC create A->D<aBC> and recursively call itself
+    -- rules such as A->aBC create A->a'<BC>, a'->a and recursively call itself
+    |  length r > 2 && startWithTerm r =  (l, (head r++"'") : [createNewNont $ tail r])  : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms 
+    -- rules such as A->DaBC create A->D<aBC> and recursively call itself
+    |  length r > 2 && not (startWithTerm r) =  (l, head r : [createNewNont $ tail r]) : transformRule' (createNewNont $ tail r) (tail r) terms 
     -- | l `elem` terms && length r > 2 && not (startWithTerm r) =  (l++"'", head r : [createNewNont $ tail r]) : (l++"'", [l]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->DaBC create A->D<aBC> and recursively call itself
     -- | l `elem` terms && length r > 2 && startWithTerm r =  (l++"'", (head r++"'") : [createNewNont $ tail r]): (l++"'", [l]) : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->aBC create A->a'<BC>, a'->a and recursively call itself
-    | l `elem` terms && length r == 2 = (l++"'", transformTerms r) : (l++"'", [l]) : concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
+    -- | l `elem` terms && length r == 2 = (l++"'", transformTerms r) : (l++"'", [l]) : concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
     | length r == 2 = [(l, transformTerms r)] ++ concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
     | otherwise = []
         where 
