@@ -2,6 +2,7 @@
 -- Author: Marek Sarvas
 -- Login: xsarva00
 -- Date: 2021/2022
+-- Module: Main project module, performing IO actions
 
 module Main (main) where
 
@@ -22,9 +23,10 @@ checkSemantics g =
     else if not startInRules then error "Start symbol is not present on left side of any rule."
     else g 
         where 
-            hasDuplicates x = length x /= length (nub x)
-            startInRules = any (\r -> fst r == startNonterm g) (rules g)
+            hasDuplicates x = length x /= length (nub x) -- return True if input has duplicate values
+            startInRules = any (\r -> fst r == startNonterm g) (rules g) -- returns True if at least 1 rule starts with grammar's Start Symbol
 
+-- checks if every rule start with valid nonterminal and right side is composed of valid terminals+nonterminals
 checkRules :: Rules -> Terminals -> Nonterminals -> Bool
 checkRules [] _ _ = True
 checkRules (x:xs) terms nonterms = fst x `elem` nonterms && all (\y -> y `elem` (terms++nonterms)) (snd x) && checkRules xs terms nonterms

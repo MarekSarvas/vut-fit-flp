@@ -33,7 +33,7 @@ if [ $option != "e" ]; then
             # run programme
             ./$proj ${prefix}${option} ${TEST_PATH}/${test_in} > ${TEST_PATH}/tmp
             # check nonterminals
-            diff <(head -n 1 ${TEST_PATH}/tmp | sort) <(head -n 1 ${TEST_PATH}/${test_out} | sort) > /dev/null
+            diff <(head -n 1 ${TEST_PATH}/tmp | sed -e $'s/,/\\\n/g' | sort) <(head -n 1 ${TEST_PATH}/${test_out} | sed -e $'s/,/\\\n/g' | sort) 
             if [ $(echo $?) -ne 0 ]; then
                 echo "Wrong nonterminals"
                 continue

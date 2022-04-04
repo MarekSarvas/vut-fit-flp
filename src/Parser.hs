@@ -11,7 +11,6 @@ import Text.Parsec.String (Parser)
 
 import Types (Nonterminals, Nonterminal, Terminal, Terminals, Rule, Rules, Grammar(..))
 
--- ============= PARSER ====================
 -- Parse correct Nonterminal input 
 parseNonTerminals :: Parser Nonterminals 
 parseNonTerminals = sepBy1 parseOneNonTerminal (char ',') <* newline --read until \n
@@ -49,14 +48,6 @@ parseRight = many1 (oneOf (['A'..'Z']++['a'..'z']))
 -- parse whole content to Grammar inner representation
 parseGrammar :: String -> Either ParseError Grammar
 parseGrammar = parse parseGrammar'' "Wrong input grammar"
-
---parseGrammar' :: Parser Grammar 
---parseGrammar'  = do
---    nonterms <- parseNonTerminals 
---    terms <- parseTerminals  
---    start <- parseStartSymbol
---    rule <- parseRules <* eof
---    return Grammar {nonterminals=nonterms, terminals=terms, startNonterm=start, rules=rule}
 
 -- call all parser and create Grammar representaion
 parseGrammar'' :: Parser Grammar 

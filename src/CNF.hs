@@ -2,6 +2,7 @@
 -- Author: Marek Sarvas
 -- Login: xsarva00
 -- Date: 2021/2022
+-- Module: Implementation of algorithm for transforming Grammar into CNF
 
 module CNF (toCNF) where
 
@@ -9,7 +10,6 @@ import Data.List (nub, intercalate, union)
 
 import Types (Nonterminals, Nonterminal, Terminals, Rule, Rules, Grammar(..))  
 
--- ===================== Algorithm 2 =======================
 -- transform Grammar to CNF
 toCNF :: Grammar -> Grammar 
 toCNF g = Grammar {nonterminals=newNonterms, terminals=terminals g, startNonterm=startNonterm g, rules=newRules}
@@ -34,13 +34,10 @@ transformRule' l r terms -- l is left side of rule, r right side of the rule
     |  length r > 2 && startWithTerm r =  (l, (head r++"'") : [createNewNont $ tail r])  : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms 
     -- rules such as A->DaBC create A->D<aBC> and recursively call itself
     |  length r > 2 && not (startWithTerm r) =  (l, head r : [createNewNont $ tail r]) : transformRule' (createNewNont $ tail r) (tail r) terms 
-    -- | l `elem` terms && length r > 2 && not (startWithTerm r) =  (l++"'", head r : [createNewNont $ tail r]) : (l++"'", [l]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->DaBC create A->D<aBC> and recursively call itself
-    -- | l `elem` terms && length r > 2 && startWithTerm r =  (l++"'", (head r++"'") : [createNewNont $ tail r]): (l++"'", [l]) : (head r++"'", [head r]) : transformRule' (createNewNont $ tail r) (tail r) terms -- rules such as A->aBC create A->a'<BC>, a'->a and recursively call itself
-    -- | l `elem` terms && length r == 2 = (l++"'", transformTerms r) : (l++"'", [l]) : concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
+    -- if the right has only 2 symbols i.e. AA, aa, aA, Aa. Terminals are changed to nonterminals e.g. a into a' and adds new rules like a'->a
     | length r == 2 = [(l, transformTerms r)] ++ concatMap (\r' -> if r' `elem` terms then [(r'++"'", [r'])] else [] ) r
     | otherwise = []
         where 
             startWithTerm x = head x `elem` terms -- return Bool if right side of rule starts with terminal symbol
             createNewNont x = intercalate "" (["<"] ++ x ++ [">"]) -- create new nonterminal according to algorithm e.g. ["A", "a", "C"] -> "<AaC>" 
             transformTerms x = map (\y -> if y `elem` terms then y++"'" else y) x -- create nonterminal from terminal or no change if nonterminal is present
-

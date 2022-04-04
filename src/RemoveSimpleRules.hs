@@ -2,7 +2,7 @@
 -- Author: Marek Sarvas
 -- Login: xsarva00
 -- Date: 2021/2022
--- Module: Implementation of algorithm for removing simple rules form Grammar
+-- Module: Implementation of algorithm for removing simple rules from Grammar
 
 module RemoveSimpleRules (removeSimple) where
 
@@ -10,7 +10,6 @@ import Data.List (nub)
 
 import Types (Nonterminals, Terminals, Rules, Grammar(..), NaSet, NaSets)  
 
--- ======================= Algorithm 1 =======================
 -- remove simple rules and create updated Grammar
 removeSimple :: Grammar -> Grammar
 removeSimple g = Grammar {nonterminals=nonterminals g, terminals=terminals g, startNonterm=startNonterm g, rules=newRules}
@@ -46,4 +45,3 @@ getSimpleRules rs nonts = filter ( \r -> any (`elem` nonts) (snd r) && length (s
 -- get list of rules witout simple rules
 removeSimpleRules :: Rules -> Terminals -> Rules
 removeSimpleRules rs ts = filter ( \r -> any (`elem` ts) (snd r) || length (snd r) /= 1) rs
-
