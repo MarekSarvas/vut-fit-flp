@@ -8,7 +8,15 @@
 - *make test2* runs tests with programme argument '**2**'
 - *make tests* runs all tests
 ## Implementation
-The programme for removing simple rules and transforming BKG into CNF is implemented in 5 modules is **src/** folder.
+The programme for removing simple rules and transforming BKG into CNF is implemented in 5 modules is **src/** folder.\
+This programme supports only one argument [-i|1|2] at a time, the combination of these throws an error.\
+Programme should stopped with an error if:
+- grammar has illegal terminals or nonterminals
+- starting symbol is not in nonterminals
+- grammar has duplicate rules/terminals/nonterminals
+- there are empty lines
+- any rule contains a symbol that is not between terminals or nonterminals
+- invalid combination of programme arguments appears
 ### Types.hs
 Includes implementation of custom data type representing Grammar and its terminal, nonterminal, starting symbols and rules.
 ### Parser.hs
