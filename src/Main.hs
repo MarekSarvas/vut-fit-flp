@@ -5,7 +5,7 @@
 -- Module: Main project module, performing IO actions
 
 module Main (main) where
-
+import Control.Applicative
 import System.Environment   
 import Text.Parsec (ParseError)
 import Data.List (nub)

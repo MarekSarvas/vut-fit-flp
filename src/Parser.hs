@@ -6,6 +6,7 @@
 
 module Parser (parseGrammar) where 
 
+import Control.Applicative
 import Text.Parsec (char, endBy, eof, many1, newline, oneOf, parse, ParseError, sepBy1, string)
 import Text.Parsec.String (Parser)
 
