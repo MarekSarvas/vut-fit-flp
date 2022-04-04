@@ -22,7 +22,7 @@ stdin: flp21-fun
 	./flp21-fun -i 
 
 zip:
-	zip -r flp-fun-xsarva00.zip ./doc ./src ./test Makefile test.sh
+	zip -r flp-fun-xsarva00.zip README.md ./src ./test Makefile test.sh
 
 clean:
 	rm ./flp21-fun src/*.hi src/*.o test/tmp
