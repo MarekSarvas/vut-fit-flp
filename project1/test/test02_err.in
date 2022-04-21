@@ -1,0 +1,10 @@
+S,A,B
+a,b,c,d
+S
+S->AB
+S->AB
+A->aAb
+A->ab
+S->A
+B->cad
+B->cd

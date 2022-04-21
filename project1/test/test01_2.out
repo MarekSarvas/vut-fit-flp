@@ -1,0 +1,16 @@
+S,A,B,a',<Ab>,b',c',<ad>,d'
+a,b,c,d
+S
+<Ab>->Ab'
+<ad>->a'd'
+A->a'<Ab>
+A->a'b'
+B->c'<ad>
+B->c'd'
+S->AB
+S->a'<Ab>
+S->a'b'
+a'->a
+b'->b
+c'->c
+d'->d
