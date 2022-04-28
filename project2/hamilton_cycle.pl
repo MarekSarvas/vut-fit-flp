@@ -3,7 +3,22 @@ remove_spaces([], []).
 remove_spaces([[A, _, B]|Ls], Rem) :- 
     remove_spaces(Ls, Rem2), 
     append([[A, B]], Rem2, Rem).
-    
+
+nodes([], []).
+nodes([[N1, N2]|Edges], Ns) :-
+    nodes(Edges, NsRec),
+    append([N1, N2], NsRec, Ns).
+
+same_node(X, Y) :-
+    X == Y.
+
+is_in_list(H, [H|_]) :- !.
+is_in_list(H, [_|T]) :- is_in_list(H, T).
+
+remove_duplicates(X, Y) :- remove_duplicates(X, Y, []).
+remove_duplicates([], [], _).
+remove_duplicates([H|T1], [H|T2], Seen) :- \+ member(H, Seen), remove_duplicates(T1, T2, [H|Seen]).
+remove_duplicates([H|T1], T2, Seen) :- member(H, Seen), remove_duplicates(T1, T2, Seen).
 
 /**Prevzate z wis input2.pl: nacita riadky(hrany) zo standardneho vstupu a skonci na EOF alebo EOL */
 read_line(L, C) :-
@@ -22,7 +37,12 @@ read_lines(Ls) :-
 start :- 
     prompt(_, ''),
     read_lines(LL),
-    remove_spaces(LL, S),
-    write(S),
+    remove_spaces(LL, Edges),
+    nodes(Edges, Nodes),
+    remove_duplicates(Nodes, Cleaned),
+    write(Edges),
+    nl,
+    write(Cleaned),
+    nl,
     halt.
 
