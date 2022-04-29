@@ -6,6 +6,7 @@ flp21-log: hamilton_cycle.pl
 
 io: basic_io.pl
 	swipl -q -g start -o io -c basic_io.pl
+	./io < test.in
 tut: log_tut.pl
 	swipl -q -g start -o tut -c log_tut.pl
 zip:

@@ -9,9 +9,6 @@ nodes([[N1, N2]|Edges], Ns) :-
     nodes(Edges, NsRec),
     append([N1, N2], NsRec, Ns).
 
-same_node(X, Y) :-
-    X == Y.
-
 is_in_list(H, [H|_]) :- !.
 is_in_list(H, [_|T]) :- is_in_list(H, T).
 
