@@ -17,6 +17,16 @@ remove_duplicates([], [], _).
 remove_duplicates([H|T1], [H|T2], Seen) :- \+ member(H, Seen), remove_duplicates(T1, T2, [H|Seen]).
 remove_duplicates([H|T1], T2, Seen) :- member(H, Seen), remove_duplicates(T1, T2, Seen).
 
+remove_duplicates2(X, Y) :- remove_duplicates(X, Y, []).
+remove_duplicates2([], [], _).
+remove_duplicates2([H|T1], [H|T2], Seen) :- 
+    \+ member(H, Seen), 
+    remove_duplicates(T1, T2, [H|Seen]).
+remove_duplicates2([H|T1], T2, Seen) :- 
+    member(H, Seen), 
+    remove_duplicates(T1, T2, Seen).
+
+
 get_last([T], T).
 get_last([_|T], L) :-
     get_last(T, L).
@@ -36,30 +46,40 @@ del_item([H|T], Item, New) :-
     del_item(T, Item, NewRec),
     append([H], NewRec, New).
 
-
 create_cycles([], [H|T], H, Cycle) :-
     edge(H, Next),
     get_last([H|T], Next),
-    append([Next], [H|T], Cycle), !.
+    append([Next], [H|T], Cycle).
 
 create_cycles(Vertices, Seen, Prev, Cycle) :-
     edge(Prev, NextV),
-    member(NextV, Vertices),
+    \+ member(NextV, Seen),
     del_item(Vertices, NextV, NewVert),
     create_cycles(NewVert, [NextV|Seen], NextV, Cycle).
 
 
-
-check(Vertices, Seen, Prev, Cycle) :-
-    edge(Prev, NextV),
-    member(NextV, Vertices),
-    del_item(Vertices, NextV, NewVert),
-    create_cycles(NewVert, [NextV|Seen], NextV, Cycle).
-
-
+rev([], []).
+rev([H|T], New) :-
+    rev(T, Tmp),
+    append(Tmp, [H], New).
 
 prep_cycles([H|T], H, T).
-    
+
+is_eq(X, Y) :-
+    rev(Y, Yrev),
+    X = Yrev.
+
+is_eq2([], _).
+is_eq2([H|T], C) :-
+    is_eq(H, C),
+    is_eq2(T, C).
+
+remove_dup_cycles([], []).
+remove_dup_cycles([H|T], New) :-
+    rev(H, Hrev),
+    \+ member(Hrev, New),
+    remove_dup_cycles(T, New).
+    %append(H, Seen, New).
 
 /**Prevzate z wis input2.pl: nacita riadky(hrany) zo standardneho vstupu a skonci na EOF alebo EOL */
 read_line(L, C) :-
