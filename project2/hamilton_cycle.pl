@@ -36,11 +36,11 @@ del_item([H|T], Item, New) :-
     del_item(T, Item, NewRec),
     append([H], NewRec, New).
 
+
 create_cycles([], [H|T], H, Cycle) :-
     edge(H, Next),
-    last([H|T], Next),
-    append([Next], [H|T],Seen2),
-    Cycle = Seen2.
+    get_last([H|T], Next),
+    append([Next], [H|T], Cycle), !.
 
 create_cycles(Vertices, Seen, Prev, Cycle) :-
     edge(Prev, NextV),
@@ -50,6 +50,16 @@ create_cycles(Vertices, Seen, Prev, Cycle) :-
 
 
 
+check(Vertices, Seen, Prev, Cycle) :-
+    edge(Prev, NextV),
+    member(NextV, Vertices),
+    del_item(Vertices, NextV, NewVert),
+    create_cycles(NewVert, [NextV|Seen], NextV, Cycle).
+
+
+
+prep_cycles([H|T], H, T).
+    
 
 /**Prevzate z wis input2.pl: nacita riadky(hrany) zo standardneho vstupu a skonci na EOF alebo EOL */
 read_line(L, C) :-
@@ -71,10 +81,18 @@ start :-
     remove_spaces(LL, Edges),
     nodes(Edges, Nodes),
     remove_duplicates(Nodes, Cleaned),
-    create_clause(Edges),
+    create_edges(Edges),
+    prep_cycles(Cleaned, H, T),
+    create_cycles(T, [H], H, Cycle),
+    write(T),
+    nl,
+    write(H),
+    nl,
     write(Edges),
     nl,
     write(Cleaned),
+    nl,
+    write(Cycle),
     nl,
     halt.
 
