@@ -1,3 +1,9 @@
+/**
+ * Project: VUT FIT FLP - Hamiltonian Cycle
+ * Author: Marek Sarvas
+ * Login: xsarva00
+ */
+
 /** remove space from line to create edge in format [A, B] */
 remove_spaces([], []).
 remove_spaces([[A, _, B]|Ls], Rem) :- 

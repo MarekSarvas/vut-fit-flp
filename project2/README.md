@@ -3,7 +3,7 @@
 **Login**: xsarva00
 ## Run
 - *make* compiles the programme
-- *make run* runs programme on test input taken from assignment
+- *make run* runs programme on *tests/test.in* test input taken from assignment
 ## Implementation
 1. input is read into array of lines, where every line is stored as [V1, , V2], where V1, V2 are nodes of graph
 2. empty space is removed and list of nodes is created
@@ -16,3 +16,8 @@
     - seen nodes are concatenated and cretes all hamilton cycles, including duplicate one (duplicate in reverse direction)
 5. remove duplicates by taking out cycle and removing also its reverse from list of all cycles 
 6. print in correct format
+## Tests
+3 simple test files with input text are included in **tests/** folder. All tests run around 0.020s real time / 0.006 sys time on merlin.
+1. *test.in* assignment edges
+2. *test2.in* some 5 node graph
+3. *test3.in* simple triangle
