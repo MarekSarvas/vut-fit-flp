@@ -81,6 +81,19 @@ remove_dup_cycles([H|T], New) :-
     remove_dup_cycles(T, New).
     %append(H, Seen, New).
 
+
+
+make_edge([_], []).
+make_edge([A, B|T], New) :-
+    make_edge([B|T], NewTmp),
+    append([[A, B]], NewTmp, New).
+
+make_edges([], []).
+make_edges([H|T], New) :-
+    make_edge(H, X),
+    make_edges(T, NewTmp),
+    append([X], NewTmp, New).
+
 /**Prevzate z wis input2.pl: nacita riadky(hrany) zo standardneho vstupu a skonci na EOF alebo EOL */
 read_line(L, C) :-
     get_char(C),
@@ -104,7 +117,9 @@ start :-
     create_edges(Edges),
     prep_cycles(Cleaned, H, T),
     create_cycles(T, [H], H, Cycle),
-    write(T),
+    make_edges(Cycle, EdgedCycle),
+    remove_duplicates(EdgedCycle, Fin),
+    write(Fin),
     nl,
     write(H),
     nl,
