@@ -1,9 +1,0 @@
-S,A,B
-a,b,c,d
-S
-A->aAb
-A->ab
-B->cad
-B->cd
-S->A
-S->AB
