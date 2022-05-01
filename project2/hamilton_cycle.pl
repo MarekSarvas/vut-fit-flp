@@ -1,32 +1,22 @@
-
+/** remove space from line to create edge in format [A, B] */
 remove_spaces([], []).
 remove_spaces([[A, _, B]|Ls], Rem) :- 
     remove_spaces(Ls, Rem2), 
     append([[A, B]], Rem2, Rem).
 
+/** create list of graph nodes from edges */
 nodes([], []).
 nodes([[N1, N2]|Edges], Ns) :-
     nodes(Edges, NsRec),
     append([N1, N2], NsRec, Ns).
 
-is_in_list(H, [H|_]) :- !.
-is_in_list(H, [_|T]) :- is_in_list(H, T).
-
+/** remove duplicate nodes(creating when loading edges) from graph */
 remove_duplicates(X, Y) :- remove_duplicates(X, Y, []).
 remove_duplicates([], [], _).
 remove_duplicates([H|T1], [H|T2], Seen) :- \+ member(H, Seen), remove_duplicates(T1, T2, [H|Seen]).
 remove_duplicates([H|T1], T2, Seen) :- member(H, Seen), remove_duplicates(T1, T2, Seen).
 
-remove_duplicates2(X, Y) :- remove_duplicates(X, Y, []).
-remove_duplicates2([], [], _).
-remove_duplicates2([H|T1], [H|T2], Seen) :- 
-    \+ member(H, Seen), 
-    remove_duplicates(T1, T2, [H|Seen]).
-remove_duplicates2([H|T1], T2, Seen) :- 
-    member(H, Seen), 
-    remove_duplicates(T1, T2, Seen).
-
-
+/** get last item of the list */
 get_last([T], T).
 get_last([_|T], L) :-
     get_last(T, L).
@@ -38,7 +28,7 @@ create_edges([[X, Y]|T]) :-
     assertz(edge(Y, X)),
     create_edges(T).
 
-
+/** deletes vertex from list of available vertices */
 del_item([], _, []).
 del_item([H|T], H, New) :-
     del_item(T, H, New).
@@ -46,6 +36,7 @@ del_item([H|T], Item, New) :-
     del_item(T, Item, NewRec),
     append([H], NewRec, New).
 
+/** create hamilton cycles */
 create_cycles([], [H|T], H, Cycle) :-
     edge(H, Next),
     get_last([H|T], Next),
@@ -57,42 +48,47 @@ create_cycles(Vertices, Seen, Prev, Cycle) :-
     del_item(Vertices, NextV, NewVert),
     create_cycles(NewVert, [NextV|Seen], NextV, Cycle).
 
+prep_cycles([H|T], H, T).
 
+/** create reverse list, used for creating reverse hamilton cycle for removing duplicates*/
 rev([], []).
 rev([H|T], New) :-
     rev(T, Tmp),
     append(Tmp, [H], New).
 
-prep_cycles([H|T], H, T).
+/** remove cycle C from list [H|T] */
+del_rev(_, [], []).
+del_rev(C, [C|T], NewL) :-
+   del_rev(C, T, NewL).
+del_rev(C, [H|T], [H|Tl]):-
+    H \= C,
+    del_rev(C, T, Tl).
 
-is_eq(X, Y) :-
-    rev(Y, Yrev),
-    X = Yrev.
-
-is_eq2([], _).
-is_eq2([H|T], C) :-
-    is_eq(H, C),
-    is_eq2(T, C).
-
+/** remove duplicate cycles -> removes take cycle H and removes its reverse cycle(duplicate) */
 remove_dup_cycles([], []).
 remove_dup_cycles([H|T], New) :-
     rev(H, Hrev),
-    \+ member(Hrev, New),
-    remove_dup_cycles(T, New).
-    %append(H, Seen, New).
+    del_rev(Hrev, T, TNoRev),
+    remove_dup_cycles(TNoRev, Seen),
+    append([H], Seen, New).
 
 
+/** Print one cycle in correct format */
+print_cycle([]):- !.
+print_cycle([_]) :- !.
+print_cycle([A,B|T]) :-
+    write(A),
+    write('-'),
+    write(B),
+    write(' '),
+    print_cycle([B|T]).
 
-make_edge([_], []).
-make_edge([A, B|T], New) :-
-    make_edge([B|T], NewTmp),
-    append([[A, B]], NewTmp, New).
-
-make_edges([], []).
-make_edges([H|T], New) :-
-    make_edge(H, X),
-    make_edges(T, NewTmp),
-    append([X], NewTmp, New).
+/** print all cycles */
+print_cycles([]) :- !.
+print_cycles([H|T]) :-
+    print_cycle(H),
+    nl,
+    print_cycles(T).
 
 /**Prevzate z wis input2.pl: nacita riadky(hrany) zo standardneho vstupu a skonci na EOF alebo EOL */
 read_line(L, C) :-
@@ -116,18 +112,7 @@ start :-
     remove_duplicates(Nodes, Cleaned),
     create_edges(Edges),
     prep_cycles(Cleaned, H, T),
-    create_cycles(T, [H], H, Cycle),
-    make_edges(Cycle, EdgedCycle),
-    remove_duplicates(EdgedCycle, Fin),
-    write(Fin),
-    nl,
-    write(H),
-    nl,
-    write(Edges),
-    nl,
-    write(Cleaned),
-    nl,
-    write(Cycle),
-    nl,
+    findall(Cycle, create_cycles(T, [H], H, Cycle), FinDup),
+    remove_dup_cycles(FinDup, Fin),
+    print_cycles(Fin),
     halt.
-
